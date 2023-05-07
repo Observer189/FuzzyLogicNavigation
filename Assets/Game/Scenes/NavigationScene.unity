@@ -15769,11 +15769,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   name: AI 1
-  playerType: 2
+  playerType: 1
   team:
     number: 1
     color: {r: 0, g: 0, b: 0, a: 0}
-  ship: {fileID: 0}
+  ship: {fileID: 1771196695}
 --- !u!1 &1033447899
 GameObject:
   m_ObjectHideFlags: 0
@@ -31564,7 +31564,7 @@ MonoBehaviour:
   team:
     number: 0
     color: {r: 0, g: 0, b: 0, a: 0}
-  ship: {fileID: 1771196695}
+  ship: {fileID: 0}
 --- !u!114 &1751918978
 MonoBehaviour:
   m_ObjectHideFlags: 0
