@@ -12,6 +12,8 @@ public class ShipController : MonoBehaviour
     public ShipInfo info;
     public Transform cameraTarget;
 
+    public Feeler[] feelers;
+
     public PropertyManager PropertyManager { get; private set; }
 
     private Rigidbody2D body;
