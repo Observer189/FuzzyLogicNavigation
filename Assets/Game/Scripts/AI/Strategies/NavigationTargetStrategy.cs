@@ -15,6 +15,7 @@ public class NavigationTargetStrategy : AIStrategy
     public override void ApplyStrategy(ShipOrder order, AIMind mind)
     {
         //order.movementHasRotationDirection = true;
+        order.movementOrderType = MovementOrderType.TargetSpeed;
         if (mind.Perception.navigationTarget != null)
         {
             /*Vector3 moveVec = new Vector3(mind.Perception.navigationTarget.position.x, 0,
@@ -41,19 +42,19 @@ public class NavigationTargetStrategy : AIStrategy
             var rules = expertSystemData.rules;
              
             ///Алгоритм экспертной системы должен вызываться здесь!
-            
-            
-            
+
+
             
             ///Дефаззифицированная скорость корабля
-            float targetSpeed = 0;
+            float targetSpeed = (mind.Perception.navigationTarget.position - mind.Ship.transform.position).magnitude*10;
             ///Дефазифицированная скорость поворота корабля
-            float targetRotation = 0;
+            float targetRotation = -angleToTarget * 10;
             ///Дефазифицированная горизонтальная скорость корабля, получаемая за счет работы боковых ускорителей 
             float targetHorizontalSpeed = 0;
             
             ///Здесь мы используя рассчитанные параметры отдаем приказ на движение кораблю
-            var moveVec = new Vector3(Math.Sign(targetRotation),Math.Sign(targetSpeed),0);
+            //var moveVec = new Vector3(Math.Sign(targetRotation),Math.Sign(targetSpeed),0);
+            var moveVec = new Vector3(targetSpeed, targetRotation, targetHorizontalSpeed);
             
             order.movement = moveVec;
 

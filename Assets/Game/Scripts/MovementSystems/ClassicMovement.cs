@@ -40,8 +40,9 @@ public class ClassicMovement : PropertyObject, IMovementSystem
     //Переменная используемая в случае если нам необходимо довести поворот объекта до определенной градусной меры
     //Например при повороте ракеты
     private float? targetRotation=null;
+    private bool isInTargetSpeedMode;
     private Rigidbody2D shipBody;
-    private Vector2 targetMovement;
+    private Vector3 targetMovement;
     private (bool, bool) throttleUse;
 
     private float lastFrameSpeed;
@@ -68,6 +69,11 @@ public class ClassicMovement : PropertyObject, IMovementSystem
     public void SetMovement(Vector2 movement)
     {
         targetMovement = movement;
+    }
+
+    public void SetTargetSpeedMode(bool flag)
+    {
+        isInTargetSpeedMode = flag;
     }
 
     public void SetUseThrottles(bool left, bool right)
@@ -106,59 +112,107 @@ public class ClassicMovement : PropertyObject, IMovementSystem
 
     public void ProcessMovement()
     {
-        
-        calculatedAcceleration = (shipBody.velocity.magnitude - this.lastFrameSpeed)/Time.deltaTime;
-        lastFrameSpeed = shipBody.velocity.magnitude;
-        if (targetMovement.y > 0)
+        if (!isInTargetSpeedMode)
         {
-            //shipBody.AddForce(forwardDir.up*enginePower*Time.deltaTime,ForceMode2D.Impulse);
-            shell.AddImpulse(forwardDir.up*MainEnginePower*Time.deltaTime);
-        }
-        else if (targetMovement.y < 0)
-        {
-            shell.AddImpulse(-forwardDir.up*backEngineModifier*MainEnginePower*Time.deltaTime);
-        }
-
-        if (throttleUse is { Item1: true, Item2: false })
-        {
-            shell.AddImpulse(-forwardDir.right*sideThrottlesPower*Time.deltaTime);
-        }
-        else if(throttleUse is { Item2: true, Item1: false })
-        {
-            shell.AddImpulse(forwardDir.right*sideThrottlesPower*Time.deltaTime);
-        }
-        //Debug.Log($"Target: {-targetMovement.x*angularSpeed}, Current: {shipBody.angularVelocity}, Torque: {((-targetMovement.x*angularSpeed)-shipBody.angularVelocity)}");
-        ///Рассчитываем максимальную скорость которую мы можем развить или наоборот сбросить
-        var maxMomentaryAngularSpeed = AngularPower / (Mathf.Deg2Rad * shipBody.inertia);
-        
-        var targetAngularSpeed = (-targetMovement.x * AngularSpeed);
-        if (targetRotation != null)
-        {
-            ///Если мы и так достаточно точно развенуты на цель, то сбрасываем скорость до нуля
-            if (Mathf.Abs(targetRotation.Value)<rotationEpsilon)
+            calculatedAcceleration = (shipBody.velocity.magnitude - this.lastFrameSpeed) / Time.deltaTime;
+            lastFrameSpeed = shipBody.velocity.magnitude;
+            if (targetMovement.y > 0)
             {
-                targetRotation = 0;
-                targetAngularSpeed = 0;
+                //shipBody.AddForce(forwardDir.up*enginePower*Time.deltaTime,ForceMode2D.Impulse);
+                shell.AddImpulse(forwardDir.up * MainEnginePower * Time.deltaTime);
             }
-            else
+            else if (targetMovement.y < 0)
             {
-                targetAngularSpeed = Mathf.Sign(targetRotation.Value) * maxMomentaryAngularSpeed;
+                shell.AddImpulse(-forwardDir.up * backEngineModifier * MainEnginePower * Time.deltaTime);
+            }
+
+            if (throttleUse is { Item1: true, Item2: false })
+            {
+                shell.AddImpulse(-forwardDir.right * sideThrottlesPower * Time.deltaTime);
+            }
+            else if (throttleUse is { Item2: true, Item1: false })
+            {
+                shell.AddImpulse(forwardDir.right * sideThrottlesPower * Time.deltaTime);
+            }
+
+            //Debug.Log($"Target: {-targetMovement.x*angularSpeed}, Current: {shipBody.angularVelocity}, Torque: {((-targetMovement.x*angularSpeed)-shipBody.angularVelocity)}");
+            ///Рассчитываем максимальную скорость которую мы можем развить или наоборот сбросить
+            var maxMomentaryAngularSpeed = AngularPower / (Mathf.Deg2Rad * shipBody.inertia);
+
+            var targetAngularSpeed = (-targetMovement.x * AngularSpeed);
+            if (targetRotation != null)
+            {
+                ///Если мы и так достаточно точно развенуты на цель, то сбрасываем скорость до нуля
+                if (Mathf.Abs(targetRotation.Value) < rotationEpsilon)
+                {
+                    targetRotation = 0;
+                    targetAngularSpeed = 0;
+                }
+                else
+                {
+                    targetAngularSpeed = Mathf.Sign(targetRotation.Value) * maxMomentaryAngularSpeed;
+                }
+
+                //Debug.Log(targetRotation.Value);
+                //Debug.Log((AngularPower/shipBody.inertia)*Mathf.Rad2Deg);
+                /*Debug.Log($"Target angular speed: {shipBody.angularVelocity}");
+                Debug.Log($"Estimated acceleration: {targetAngularSpeed - shipBody.angularVelocity}");
+                Debug.Log($"Calculated acceleration: {shipBody.angularVelocity - lastFrameAngularSpeed}");*/
+            }
+
+            lastFrameAngularSpeed = shipBody.angularVelocity;
+            //Debug.Log(targetRotation);
+            var torque = (targetAngularSpeed - shipBody.angularVelocity) * Mathf.Deg2Rad * shipBody.inertia;
+            torque = Mathf.Sign(torque) * Mathf.Min(Mathf.Abs(torque), AngularPower);
+            shipBody.AddTorque(torque, ForceMode2D.Impulse);
+            //MMDebug.DebugDrawArrow(shipBody.position,shipBody.transform.up,Color.green,10f,1f);
+        }
+        else
+        {
+            var velMag = shipBody.velocity.magnitude;
+            var verticalSpeedProjection = (velMag == 0)?0:
+                Vector2.Dot(shipBody.velocity, transform.up)/velMag;
+            var horizontalSpeedProjection = (velMag == 0)?0:
+                Vector2.Dot(shipBody.velocity, transform.right) / velMag;
+            
+            if (verticalSpeedProjection < targetMovement.x)
+            {
+                shell.AddImpulse(forwardDir.up * MainEnginePower * Time.deltaTime);
+                ///Эта переменная в контексте движения нам больше не нужна, но мы ее меняем так, чтобы
+                /// работала корректная визуализация двигателей
+                targetMovement.x = 1;
+            }
+            else if (verticalSpeedProjection > targetMovement.x)
+            {
+                shell.AddImpulse(-forwardDir.up * backEngineModifier * MainEnginePower * Time.deltaTime);
+                targetMovement.x = -1;
+            }
+
+            if (horizontalSpeedProjection < targetMovement.z)
+            {
+                shell.AddImpulse(forwardDir.right * sideThrottlesPower * Time.deltaTime);
+                throttleUse = (false,true);
+            }
+            else if (horizontalSpeedProjection > targetMovement.z)
+            {
+                shell.AddImpulse(-forwardDir.right * sideThrottlesPower * Time.deltaTime);
+                throttleUse = (true,false);
             }
             
-            //Debug.Log(targetRotation.Value);
-            //Debug.Log((AngularPower/shipBody.inertia)*Mathf.Rad2Deg);
-            /*Debug.Log($"Target angular speed: {shipBody.angularVelocity}");
-            Debug.Log($"Estimated acceleration: {targetAngularSpeed - shipBody.angularVelocity}");
-            Debug.Log($"Calculated acceleration: {shipBody.angularVelocity - lastFrameAngularSpeed}");*/
+            
+            var torque = (targetMovement.y - shipBody.angularVelocity) * Mathf.Deg2Rad * shipBody.inertia;
+            torque = Mathf.Sign(torque) * Mathf.Min(Mathf.Abs(torque), AngularPower);
+            shipBody.AddTorque(torque, ForceMode2D.Impulse);
+            if (torque<0)
+            {
+                targetMovement.y = 1;
+            }
+            else if (torque>0)
+            {
+                targetMovement.y = -1;
+            }
         }
-        lastFrameAngularSpeed = shipBody.angularVelocity;
-        //Debug.Log(targetRotation);
-        var torque = (targetAngularSpeed - shipBody.angularVelocity)* Mathf.Deg2Rad * shipBody.inertia;
-        torque = Mathf.Sign(torque)*Mathf.Min(Mathf.Abs(torque), AngularPower);
-        shipBody.AddTorque(torque,ForceMode2D.Impulse);
-        //MMDebug.DebugDrawArrow(shipBody.position,shipBody.transform.up,Color.green,10f,1f);
-        
-        
+
         HandleEngineParticles();
         
         targetRotation = null;
