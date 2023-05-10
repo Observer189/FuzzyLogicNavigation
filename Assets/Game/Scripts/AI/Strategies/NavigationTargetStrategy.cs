@@ -46,9 +46,9 @@ public class NavigationTargetStrategy : AIStrategy
 
             
             ///Дефаззифицированная скорость корабля
-            float targetSpeed = (mind.Perception.navigationTarget.position - mind.Ship.transform.position).magnitude*10;
+            float targetSpeed = (mind.Perception.navigationTarget.position - mind.Ship.transform.position).magnitude/2;
             ///Дефазифицированная скорость поворота корабля
-            float targetRotation = -angleToTarget * 10;
+            float targetRotation = -angleToTarget * 5;
             ///Дефазифицированная горизонтальная скорость корабля, получаемая за счет работы боковых ускорителей 
             float targetHorizontalSpeed = 0;
             
@@ -67,6 +67,7 @@ public class NavigationTargetStrategy : AIStrategy
             {
                 order.rightAdditionalMovement = true;
             }
+            
         }
     }
 }

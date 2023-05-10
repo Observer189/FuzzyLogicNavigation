@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Game.Scripts.Utils;
 using MoreMountains.Tools;
 using UnityEngine;
 
@@ -169,12 +170,12 @@ public class ClassicMovement : PropertyObject, IMovementSystem
         }
         else
         {
+            MMDebug.DebugDrawArrow(transform.position,forwardDir.up*targetMovement.x+forwardDir.right*targetMovement.z,Color.green);
             var velMag = shipBody.velocity.magnitude;
             var verticalSpeedProjection = (velMag == 0)?0:
-                Vector2.Dot(shipBody.velocity, transform.up)/velMag;
+                shipBody.velocity.ProjectionTo(forwardDir.up);
             var horizontalSpeedProjection = (velMag == 0)?0:
-                Vector2.Dot(shipBody.velocity, transform.right) / velMag;
-            
+                shipBody.velocity.ProjectionTo(forwardDir.right);
             if (verticalSpeedProjection < targetMovement.x)
             {
                 shell.AddImpulse(forwardDir.up * MainEnginePower * Time.deltaTime);
@@ -198,8 +199,8 @@ public class ClassicMovement : PropertyObject, IMovementSystem
                 shell.AddImpulse(-forwardDir.right * sideThrottlesPower * Time.deltaTime);
                 throttleUse = (true,false);
             }
-            
-            
+
+            targetMovement.y = Mathf.Sign(targetMovement.y) * Mathf.Min(AngularSpeed, Mathf.Abs(targetMovement.y));
             var torque = (targetMovement.y - shipBody.angularVelocity) * Mathf.Deg2Rad * shipBody.inertia;
             torque = Mathf.Sign(torque) * Mathf.Min(Mathf.Abs(torque), AngularPower);
             shipBody.AddTorque(torque, ForceMode2D.Impulse);
@@ -211,6 +212,10 @@ public class ClassicMovement : PropertyObject, IMovementSystem
             {
                 targetMovement.y = -1;
             }
+            
+            /*MMDebug.DebugDrawArrow(transform.position,shipBody.velocity,Color.red);
+            MMDebug.DebugDrawArrow(transform.position,transform.up*verticalSpeedProjection,Color.magenta);
+            MMDebug.DebugDrawArrow(transform.position,transform.right*horizontalSpeedProjection,Color.magenta);*/
         }
 
         HandleEngineParticles();
