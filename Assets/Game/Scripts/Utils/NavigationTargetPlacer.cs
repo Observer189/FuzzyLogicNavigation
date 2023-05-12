@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 public class NavigationTargetPlacer : MonoBehaviour
 {
@@ -29,5 +32,13 @@ public class NavigationTargetPlacer : MonoBehaviour
       }
 
       target.position = transform.position + new Vector3(x, y);
+   }
+
+   private void Update()
+   {
+      if (Input.GetMouseButtonDown(1))
+      {
+         target.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+      }
    }
 }
