@@ -25,8 +25,16 @@ public class FuzzyVariableInfo
 {
     public string name;
 
-    public string[] possibleTerms = {};
+    public FuzzyTerm[] possibleTerms = {};
 }
+[Serializable]
+public class FuzzyTerm
+{
+    public string name;
+    public float lowerBound;
+    public float upperBound;
+}
+
 [Serializable]
 public class FuzzyRuleInfo
 {
@@ -93,7 +101,7 @@ public class ExpertSystemDataEditor : Editor
                 if (variableIndex >= 0)
                 {
                     FuzzyVariableInfo variable = data.inputVariables[variableIndex];
-                    string[] terms = variable.possibleTerms;
+                    string[] terms = variable.possibleTerms.Select(x=>x.name).ToArray();
                     int termIndex = Array.IndexOf(terms, conditionElement.FindPropertyRelative("term").stringValue);
                     rect.y += EditorGUIUtility.singleLineHeight + 2;
                     termIndex = EditorGUI.Popup(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
@@ -161,7 +169,7 @@ public class ExpertSystemDataEditor : Editor
                 if (variableIndex >= 0)
                 {
                     FuzzyVariableInfo variable = data.outputVariables[variableIndex];
-                    string[] terms = variable.possibleTerms;
+                    string[] terms = variable.possibleTerms.Select(x=>x.name).ToArray();
                     int termIndex = Array.IndexOf(terms, conclusionElement.FindPropertyRelative("term").stringValue);
                     rect.y += EditorGUIUtility.singleLineHeight + 2;
                     termIndex = EditorGUI.Popup(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
