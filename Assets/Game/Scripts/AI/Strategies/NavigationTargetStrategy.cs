@@ -33,6 +33,7 @@ public class NavigationTargetStrategy : AIStrategy
             var angleToTarget =
                 -Vector2.SignedAngle(mind.Perception.navigationTarget.position - mind.Ship.transform.position,
                     mind.Ship.transform.up);
+            var distanceToTarget = (mind.Perception.navigationTarget.position - mind.Ship.transform.position).magnitude;
             var leftFeeler = mind.Ship.feelers[0];
             var middleFeeler = mind.Ship.feelers[1];
             var rightFeeler = mind.Ship.feelers[2];
@@ -47,6 +48,7 @@ public class NavigationTargetStrategy : AIStrategy
             ///Алгоритм экспертной системы должен вызываться здесь!
             double[] inputData = new double[inputVariables.Length];
             inputData[Array.FindIndex(inputVariables, (v) => v.name == "DirToTarget")] = angleToTarget;
+            inputData[Array.FindIndex(inputVariables, (v) => v.name == "DistanceToTarget")] = distanceToTarget;
             inputData[Array.FindIndex(inputVariables, (v) => v.name == "LeftFeelerDistance")] = leftFeelerDistance;
             inputData[Array.FindIndex(inputVariables, (v) => v.name == "RightFeelerDistance")] = rightFeelerDistance;
             inputData[Array.FindIndex(inputVariables, (v) => v.name == "MiddleFeelerDistance")] = middleFeelerDistance;
@@ -56,7 +58,7 @@ public class NavigationTargetStrategy : AIStrategy
             var output = mamda.execute();
 
             ///Дефаззифицированная скорость корабля
-            float targetSpeed = 0/*(mind.Perception.navigationTarget.position - mind.Ship.transform.position).magnitude/2*/;
+            float targetSpeed = (float)output[1]/*(mind.Perception.navigationTarget.position - mind.Ship.transform.position).magnitude/2*/;
             //Debug.Log(output[0]);
             ///Дефазифицированная скорость поворота корабля
             float targetRotation = (float)output[0]/*-angleToTarget * 5*/;
@@ -202,7 +204,7 @@ public class NavigationTargetStrategy : AIStrategy
                         intervals.Add(rulesInfo[i].conclusions[j].variable.possibleTerms[termIndex+1].lowerBound);
                     }
 
-                    conclusions.Add(new Conclusion(vars[Array.FindIndex(inputVariables,
+                    conclusions.Add(new Conclusion(vars[Array.FindIndex(outputVariables,
                             (v)=>v.name==rulesInfo[i].conclusions[j].variable.name)+outputVariables.Length],new FuzzySet(intervals),1.0));
                 }
 
