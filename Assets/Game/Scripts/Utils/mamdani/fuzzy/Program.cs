@@ -31,7 +31,7 @@ namespace fuzzy
 
         static void Main(string[] args)
         {
-            List<Rule> rules = new List<Rule>();
+           /* List<Rule> rules = new List<Rule>();
 
             rules.Add(new Rule(new List<Condition>() { new Condition(new Variable(0),
                 new FuzzySet(Test.Cold))}, 
@@ -94,7 +94,7 @@ namespace fuzzy
                 Console.WriteLine("Температура: " + inputData[0] + "\n" + +result[0] + "\n=>Система кондиционирования работает на режиме горячий воздух.");
             }
 
-            Console.ReadLine();
+            Console.ReadLine();*/
 
         }
     }

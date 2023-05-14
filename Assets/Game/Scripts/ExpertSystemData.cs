@@ -26,6 +26,21 @@ public class FuzzyVariableInfo
     public string name;
 
     public FuzzyTerm[] possibleTerms = {};
+
+    public FuzzyVariableInfo GetCopy()
+    {
+        var n = new FuzzyVariableInfo();
+        n.name = name;
+        var terms = new FuzzyTerm[possibleTerms.Length];
+        for (int i = 0; i < possibleTerms.Length; i++)
+        {
+            terms[i] = possibleTerms[i].GetCopy();
+        }
+
+        n.possibleTerms = terms;
+
+        return n;
+    }
 }
 [Serializable]
 public class FuzzyTerm
@@ -33,6 +48,16 @@ public class FuzzyTerm
     public string name;
     public float lowerBound;
     public float upperBound;
+
+    public FuzzyTerm GetCopy()
+    {
+        var n = new FuzzyTerm();
+        n.name = name;
+        n.lowerBound = lowerBound;
+        n.upperBound = upperBound;
+
+        return n;
+    }
 }
 
 [Serializable]
@@ -276,6 +301,25 @@ public class ExpertSystemDataEditor : Editor
         }
 
         serializedObject.ApplyModifiedProperties();
+
+        foreach (var rule in data.rules)
+        {
+            foreach (var cond in rule.conditions)
+            {
+                cond.variable =
+                    data.inputVariables[
+                        Array.FindIndex(data.inputVariables,(v)=>v.name==cond.variable.name)
+                    ].GetCopy();
+            }
+
+            foreach (var conclusion in rule.conclusions)
+            {
+                conclusion.variable =
+                    data.outputVariables[
+                        Array.FindIndex(data.outputVariables,(v)=>v.name==conclusion.variable.name)
+                    ].GetCopy();
+            }
+        }
     }
     
     private void DrawScriptField()

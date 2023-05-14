@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace fuzzy
 {
@@ -100,6 +101,7 @@ namespace fuzzy
             {
                 double i1 = Integral(unionOfFuzzySets, true);
                 double i2 = Integral(unionOfFuzzySets, false);
+                //Debug.Log($"i1 = {i1}, i2 = {i2}");
                 y.Add(i1 / i2);
             }
             return y;
@@ -118,7 +120,7 @@ namespace fuzzy
             {
                 function = delegate (double x) { return fuzzySet.GetValue(x); };
             }
-            return Integrate(0, 100, function);
+            return Integrate(-200, 200, function);
         }
 
 
