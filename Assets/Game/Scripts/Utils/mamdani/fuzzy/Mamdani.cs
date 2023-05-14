@@ -71,8 +71,8 @@ namespace fuzzy
                     activatedFuzzySets.Add(new ActivatedFuzzySet(
                             conclusion.GetTerm(), c[i] * conclusion.GetWeight()
                     ));
-                    i++;
                 }
+                i++;
             }
             return activatedFuzzySets;
         }

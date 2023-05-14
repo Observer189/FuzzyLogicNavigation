@@ -44,6 +44,8 @@ public class NavigationTargetStrategy : AIStrategy
             ///Данные из настроек экспертной системы
             var inputVariables = expertSystemData.inputVariables;
             
+            Debug.Log(middleFeeler.FeelTarget);
+            Debug.Log(middleFeelerDistance);
              
             ///Алгоритм экспертной системы должен вызываться здесь!
             double[] inputData = new double[inputVariables.Length];
@@ -63,7 +65,7 @@ public class NavigationTargetStrategy : AIStrategy
             ///Дефазифицированная скорость поворота корабля
             float targetRotation = (float)output[0]/*-angleToTarget * 5*/;
             ///Дефазифицированная горизонтальная скорость корабля, получаемая за счет работы боковых ускорителей 
-            float targetHorizontalSpeed = 0;
+            float targetHorizontalSpeed = (float)output[2];
             
             ///Здесь мы используя рассчитанные параметры отдаем приказ на движение кораблю
             //var moveVec = new Vector3(Math.Sign(targetRotation),Math.Sign(targetSpeed),0);

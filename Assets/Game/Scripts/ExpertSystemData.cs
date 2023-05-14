@@ -234,13 +234,17 @@ public class ExpertSystemDataEditor : Editor
         {
             EditorGUI.LabelField(new Rect(rect.x,rect.y,rect.width,EditorGUIUtility.singleLineHeight),$"Rule: {j}");
             rect.y += EditorGUIUtility.singleLineHeight;
-            for (int i = 0; i < conditionLists[j].Count; i++)
-            {
-                conditionLists[j][i].DoList(new Rect(rect.x,rect.y,rect.width,rect.height-EditorGUIUtility.singleLineHeight));
-                rect.y += conditionLists[j][i].GetHeight();
-                conclusionLists[j][i].DoList(new Rect(rect.x,rect.y,rect.width,rect.height-EditorGUIUtility.singleLineHeight));
-            }
+           
+                for (int i = 0; i < conditionLists[j].Count; i++)
+                {
+                    conditionLists[j][i].DoList(new Rect(rect.x, rect.y, rect.width,
+                        rect.height - EditorGUIUtility.singleLineHeight));
+                    rect.y += conditionLists[j][i].GetHeight();
+                    conclusionLists[j][i].DoList(new Rect(rect.x, rect.y, rect.width,
+                        rect.height - EditorGUIUtility.singleLineHeight));
+                }
             
+
         };
         
         rulesList.drawHeaderCallback = (Rect rect) => { EditorGUI.LabelField(rect, "Rules"); };
@@ -248,13 +252,14 @@ public class ExpertSystemDataEditor : Editor
         rulesList.elementHeightCallback = index =>
         {
             float height = EditorGUIUtility.singleLineHeight;
+            
+                for (int i = 0; i < conditionLists[index].Count; i++)
+                {
+                    height += conditionLists[index][i].GetHeight();
+                    height += conclusionLists[index][i].GetHeight();
+                }
+            
 
-            for (int i = 0; i < conditionLists[index].Count; i++)
-            {
-                height+=conditionLists[index][i].GetHeight();
-                height+=conclusionLists[index][i].GetHeight();
-            }
-           
             return height;
         };
     }
@@ -298,6 +303,7 @@ public class ExpertSystemDataEditor : Editor
         {
             Array.Resize(ref data.rules, data.rules.Length + 1);
             data.rules[data.rules.Length - 1] = new FuzzyRuleInfo();
+            OnEnable();
         }
 
         serializedObject.ApplyModifiedProperties();
