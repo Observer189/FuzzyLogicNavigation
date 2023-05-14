@@ -15,45 +15,97 @@ MonoBehaviour:
   inputVariables:
   - name: LeftFeelerDistance
     possibleTerms:
-    - Close
-    - Medium
-    - Far
-    - Very far
+    - name: Close
+      lowerBound: 0
+      upperBound: 2
+    - name: Medium
+      lowerBound: 4
+      upperBound: 8
+    - name: Far
+      lowerBound: 10
+      upperBound: 15
+    - name: Very far
+      lowerBound: 16
+      upperBound: 1000
   - name: RightFeelerDistance
     possibleTerms:
-    - Close
-    - Medium
-    - Far
-    - Very far
+    - name: Close
+      lowerBound: 0
+      upperBound: 2
+    - name: Medium
+      lowerBound: 4
+      upperBound: 8
+    - name: Far
+      lowerBound: 10
+      upperBound: 15
+    - name: Very far
+      lowerBound: 16
+      upperBound: 1000
   - name: MiddleFeelerDistance
     possibleTerms:
-    - Close
-    - Medium
-    - Far
-    - Very far
+    - name: Close
+      lowerBound: 0
+      upperBound: 2
+    - name: Medium
+      lowerBound: 4
+      upperBound: 8
+    - name: Far
+      lowerBound: 10
+      upperBound: 15
+    - name: Very far
+      lowerBound: 16
+      upperBound: 1000
   - name: DirToTarget
     possibleTerms:
-    - Forward
-    - Left
-    - Right
+    - name: Straight
+      lowerBound: -10
+      upperBound: 10
+    - name: Left
+      lowerBound: -180
+      upperBound: -20
+    - name: Right
+      lowerBound: 20
+      upperBound: 180
   outputVariables:
   - name: Speed
     possibleTerms:
-    - Zero
-    - Slow
-    - Medium
-    - Fast
-    - Maximum
+    - name: Stop
+      lowerBound: 0
+      upperBound: 0.3
+    - name: Slow
+      lowerBound: 0.5
+      upperBound: 1
+    - name: Medium
+      lowerBound: 1.2
+      upperBound: 3
+    - name: Fast
+      lowerBound: 3.2
+      upperBound: 4
+    - name: Max
+      lowerBound: 4.5
+      upperBound: 5
   - name: Rotation
     possibleTerms:
-    - None
-    - Left
-    - Right
+    - name: None
+      lowerBound: -1
+      upperBound: 1
+    - name: Left
+      lowerBound: -10
+      upperBound: -140
+    - name: Right
+      lowerBound: 10
+      upperBound: 140
   - name: SideEngines
     possibleTerms:
-    - None
-    - Left
-    - Right
+    - name: None
+      lowerBound: 0
+      upperBound: 0
+    - name: Left
+      lowerBound: -1
+      upperBound: -5
+    - name: Right
+      lowerBound: 1
+      upperBound: 5
   rules:
   - conditions:
     - variable:
