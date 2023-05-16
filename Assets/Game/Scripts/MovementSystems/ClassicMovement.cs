@@ -67,7 +67,7 @@ public class ClassicMovement : PropertyObject, IMovementSystem
         lastFrameSpeed = shipBody.velocity.magnitude;
     }
 
-    public void SetMovement(Vector2 movement)
+    public void SetMovement(Vector3 movement)
     {
         targetMovement = movement;
     }
@@ -170,6 +170,14 @@ public class ClassicMovement : PropertyObject, IMovementSystem
         }
         else
         {
+            Debug.Log("movement: "+targetMovement.x);
+            MMDebug.DebugDrawArrow(transform.position,forwardDir.up*targetMovement.x+forwardDir.right*targetMovement.z,Color.yellow);
+            var targetNormalized = 
+                new Vector2(targetMovement.x, targetMovement.z).normalized * 
+                Mathf.Min(targetMovement.x+targetMovement.z,MaxSpeed);
+            targetMovement.MMSetX(targetNormalized.x);
+            targetMovement.MMSetZ(targetNormalized.y);
+
             MMDebug.DebugDrawArrow(transform.position,forwardDir.up*targetMovement.x+forwardDir.right*targetMovement.z,Color.green);
             var velMag = shipBody.velocity.magnitude;
             var verticalSpeedProjection = (velMag == 0)?0:
@@ -200,6 +208,7 @@ public class ClassicMovement : PropertyObject, IMovementSystem
                 throttleUse = (true,false);
             }
 
+            //Debug.Log(targetMovement.y);
             targetMovement.y = Mathf.Sign(targetMovement.y) * Mathf.Min(AngularSpeed, Mathf.Abs(targetMovement.y));
             var torque = (targetMovement.y - shipBody.angularVelocity) * Mathf.Deg2Rad * shipBody.inertia;
             torque = Mathf.Sign(torque) * Mathf.Min(Mathf.Abs(torque), AngularPower);

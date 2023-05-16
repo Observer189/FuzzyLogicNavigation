@@ -1,10 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using MoreMountains.Tools;
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditorInternal;
+#endif
 using UnityEngine;
 [CreateAssetMenu(fileName = "New Expert System", menuName = "FuzzyLogic/System data", order = 3)]
 public class ExpertSystemData : ScriptableObject
@@ -18,6 +18,250 @@ public class ExpertSystemData : ScriptableObject
 
    // public bool[] showInputTerms = {};
     //public bool[] showOutputTerms = {};
+    [ContextMenu("Generation/GenerateRules")]
+    public void GenerateRules()
+    {
+        List<FuzzyRuleInfo> newRules = new List<FuzzyRuleInfo>();
+        
+        var dirToTargetVar = Array.Find(inputVariables, (v) => v.name == "DirToTarget");
+        var distToTargetVar = Array.Find(inputVariables, (v) => v.name == "DistanceToTarget");
+        var leftFeelerDistVar = Array.Find(inputVariables, (v) => v.name == "LeftFeelerDistance");
+        var rightFeelerDistVar = Array.Find(inputVariables, (v) => v.name == "RightFeelerDistance");
+        var middleFeelerDistVar = Array.Find(inputVariables, (v) => v.name == "MiddleFeelerDistance");
+        var sideLeftFeelerDistVar = Array.Find(inputVariables, (v) => v.name == "SideLeftFeelerDistance");
+        var sideRightFeelerDistVar = Array.Find(inputVariables, (v) => v.name == "SideRightFeelerDistance");
+        
+        var targetSpeedVar = Array.Find(outputVariables, (v) => v.name == "Speed");
+        var targetRotationVar = Array.Find(outputVariables, (v) => v.name == "Rotation");
+        var sideEnginesVar = Array.Find(outputVariables, (v) => v.name == "SideEngines");
+
+        foreach (var dirToTarget in dirToTargetVar.possibleTerms)
+        {
+            foreach (var leftFeelerDistance in leftFeelerDistVar.possibleTerms)
+            {
+                foreach (var rightFeelerDistance in rightFeelerDistVar.possibleTerms)
+                {
+                    foreach (var middleFeelerDistance in middleFeelerDistVar.possibleTerms)
+                    {
+                        foreach (var sideLeftFeelerDistance in sideLeftFeelerDistVar.possibleTerms)
+                        {
+                            foreach (var sideRightFeelerDistance in sideRightFeelerDistVar.possibleTerms)
+                            {
+                                FuzzyStatement[] conditions = {
+                                    new() { variable = dirToTargetVar, term = dirToTarget.name },
+                                    new()
+                                        { variable = leftFeelerDistVar, term = leftFeelerDistance.name },
+                                    new()
+                                        { variable = rightFeelerDistVar, term = rightFeelerDistance.name },
+                                    new()
+                                        { variable = middleFeelerDistVar, term = middleFeelerDistance.name },
+                                    new()
+                                        { variable = sideLeftFeelerDistVar, term = sideLeftFeelerDistance.name },
+                                    new()
+                                        { variable = sideRightFeelerDistVar, term = sideRightFeelerDistance.name }
+                                };
+                                List<FuzzyStatement> conclusions = new List<FuzzyStatement>();
+                                if (leftFeelerDistance.name is "Far" or "Medium" &&
+                                      rightFeelerDistance.name is "Far" or "Medium" &&
+                                      middleFeelerDistance.name is "Far" or "Medium" &&
+                                    sideLeftFeelerDistance.name is "Far" or "Medium" &&
+                                    sideRightFeelerDistance.name is "Far" or "Medium")
+                                {
+                                    if (dirToTarget.name == "Straight")
+                                    {
+                                        conclusions.Add(new FuzzyStatement(){variable = targetRotationVar, 
+                                            term = targetRotationVar.possibleTerms[1].name});
+                                        if (middleFeelerDistance.name == "Far")
+                                        {
+                                            conclusions.Add(new FuzzyStatement()
+                                            {
+                                                variable = targetSpeedVar,
+                                                term = targetSpeedVar.possibleTerms[6].name
+                                            });
+                                        }
+                                        else
+                                        {
+                                            conclusions.Add(new FuzzyStatement()
+                                            {
+                                                variable = targetSpeedVar,
+                                                term = targetSpeedVar.possibleTerms[4].name
+                                            });
+                                        }
+                                        conclusions.Add(new FuzzyStatement(){variable = sideEnginesVar, 
+                                            term = sideEnginesVar.possibleTerms[2].name});
+                                    }
+                                    else if (dirToTarget.name is "Left" or "FewLeft")
+                                    {
+                                        conclusions.Add(new FuzzyStatement(){variable = targetRotationVar, 
+                                            term = targetRotationVar.possibleTerms[2].name});
+                                        conclusions.Add(new FuzzyStatement(){variable = targetSpeedVar, 
+                                            term = targetSpeedVar.possibleTerms[2].name});
+                                        conclusions.Add(new FuzzyStatement(){variable = sideEnginesVar, 
+                                            term = sideEnginesVar.possibleTerms[2].name});
+                                    }
+                                    else if(dirToTarget.name is "Right" or "FewRight")
+                                    {
+                                        conclusions.Add(new FuzzyStatement(){variable = targetRotationVar, 
+                                            term = targetRotationVar.possibleTerms[0].name});
+                                        conclusions.Add(new FuzzyStatement(){variable = targetSpeedVar, 
+                                            term = targetSpeedVar.possibleTerms[2].name});
+                                        conclusions.Add(new FuzzyStatement(){variable = sideEnginesVar, 
+                                            term = sideEnginesVar.possibleTerms[2].name});
+                                    }
+                                }
+                                else if (leftFeelerDistance.name == "Close" &&
+                                         rightFeelerDistance.name is "Far" or "Medium" &&
+                                         middleFeelerDistance.name is "Far" or "Medium" &&
+                                         sideLeftFeelerDistance.name is "Far" or "Medium" &&
+                                         sideRightFeelerDistance.name is "Far" or "Medium")
+                                {
+                                    if (dirToTarget.name is "Straight" or "FewLeft" or "FewRight" or "Right")
+                                    {
+                                        conclusions.Add(new FuzzyStatement()
+                                        {
+                                            variable = targetRotationVar,
+                                            term = targetRotationVar.possibleTerms[2].name
+                                        });
+                                    }
+                                    else
+                                    {
+                                        conclusions.Add(new FuzzyStatement()
+                                        {
+                                            variable = targetRotationVar,
+                                            term = targetRotationVar.possibleTerms[0].name
+                                        });
+                                    }
+                                    conclusions.Add(new FuzzyStatement(){variable = targetSpeedVar, 
+                                        term = targetSpeedVar.possibleTerms[1].name});
+                                    conclusions.Add(new FuzzyStatement(){variable = sideEnginesVar, 
+                                        term = sideEnginesVar.possibleTerms[2].name});
+                                }
+                                else if (rightFeelerDistance.name == "Close" &&
+                                         leftFeelerDistance.name is "Far" or "Medium" &&
+                                         middleFeelerDistance.name is "Far" or "Medium" &&
+                                         sideLeftFeelerDistance.name is "Far" or "Medium" &&
+                                         sideRightFeelerDistance.name is "Far" or "Medium")
+                                {
+                                    if (dirToTarget.name is "Straight" or "FewLeft" or "FewRight" or "Left")
+                                    {
+                                        conclusions.Add(new FuzzyStatement()
+                                        {
+                                            variable = targetRotationVar,
+                                            term = targetRotationVar.possibleTerms[0].name
+                                        });
+                                    }
+                                    else
+                                    {
+                                        conclusions.Add(new FuzzyStatement()
+                                        {
+                                            variable = targetRotationVar,
+                                            term = targetRotationVar.possibleTerms[2].name
+                                        });
+                                    }
+                                    conclusions.Add(new FuzzyStatement(){variable = targetSpeedVar, 
+                                        term = targetSpeedVar.possibleTerms[3].name});
+                                    conclusions.Add(new FuzzyStatement(){variable = sideEnginesVar, 
+                                        term = sideEnginesVar.possibleTerms[2].name});
+                                }
+                                else if (middleFeelerDistance.name == "Close" &&
+                                         rightFeelerDistance.name is "Far" or "Medium" &&
+                                         leftFeelerDistance.name is "Far" or "Medium" &&
+                                         sideLeftFeelerDistance.name is "Far" or "Medium" &&
+                                         sideRightFeelerDistance.name is "Far" or "Medium")
+                                {
+                                    if (dirToTarget.name is "Left" or "FewLeft" or "Straight" )
+                                    {
+                                        conclusions.Add(new FuzzyStatement()
+                                        {
+                                            variable = targetRotationVar,
+                                            term = targetRotationVar.possibleTerms[0].name
+                                        });
+                                    }
+                                    else
+                                    {
+                                        conclusions.Add(new FuzzyStatement()
+                                        {
+                                            variable = targetRotationVar,
+                                            term = targetRotationVar.possibleTerms[0].name
+                                        });
+                                    }
+                                    conclusions.Add(new FuzzyStatement(){variable = targetSpeedVar, 
+                                        term = targetSpeedVar.possibleTerms[3].name});
+                                    conclusions.Add(new FuzzyStatement(){variable = sideEnginesVar, 
+                                        term = sideEnginesVar.possibleTerms[2].name});
+                                }
+                                else if (sideLeftFeelerDistance.name == "Close" &&
+                                         rightFeelerDistance.name is "Far" or "Medium" &&
+                                         middleFeelerDistance.name is "Far" or "Medium" &&
+                                         leftFeelerDistance.name is "Far" or "Medium" &&
+                                         sideRightFeelerDistance.name is "Far" or "Medium")
+                                {
+                                    if (dirToTarget.name is "Left" or "FewLeft" or "Straight" or "FewRight")
+                                    {
+                                        conclusions.Add(new FuzzyStatement()
+                                        {
+                                            variable = targetRotationVar,
+                                            term = targetRotationVar.possibleTerms[1].name
+                                        });
+                                    }
+                                    else
+                                    {
+                                        conclusions.Add(new FuzzyStatement()
+                                        {
+                                            variable = targetRotationVar,
+                                            term = targetRotationVar.possibleTerms[0].name
+                                        });
+                                    }
+                                    conclusions.Add(new FuzzyStatement(){variable = targetSpeedVar, 
+                                        term = targetSpeedVar.possibleTerms[3].name});
+                                    conclusions.Add(new FuzzyStatement(){variable = sideEnginesVar, 
+                                        term = sideEnginesVar.possibleTerms[1].name});
+                                }
+                                else if (sideRightFeelerDistance.name == "Close" &&
+                                         rightFeelerDistance.name is "Far" or "Medium" &&
+                                         middleFeelerDistance.name is "Far" or "Medium" &&
+                                         leftFeelerDistance.name is "Far" or "Medium" &&
+                                         sideLeftFeelerDistance.name is "Far" or "Medium")
+                                {
+                                    if (dirToTarget.name is "Right" or "FewRight" or "Straight" or "FewLeft")
+                                    {
+                                        conclusions.Add(new FuzzyStatement()
+                                        {
+                                            variable = targetRotationVar,
+                                            term = targetRotationVar.possibleTerms[1].name
+                                        });
+                                    }
+                                    else
+                                    {
+                                        conclusions.Add(new FuzzyStatement()
+                                        {
+                                            variable = targetRotationVar,
+                                            term = targetRotationVar.possibleTerms[2].name
+                                        });
+                                    }
+                                    conclusions.Add(new FuzzyStatement(){variable = targetSpeedVar, 
+                                        term = targetSpeedVar.possibleTerms[3].name});
+                                    conclusions.Add(new FuzzyStatement(){variable = sideEnginesVar, 
+                                        term = sideEnginesVar.possibleTerms[3].name});
+                                }
+
+                                if (conclusions.Count>0)
+                                 newRules.Add(new FuzzyRuleInfo(){conditions = conditions, conclusions = conclusions.ToArray()});
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rules = newRules.ToArray();
+    }
+
+    [ContextMenu("Generation/ClearRules")]
+    public void ClearRules()
+    {
+        rules = Array.Empty<FuzzyRuleInfo>();
+    }
 }
 
 [Serializable]
@@ -72,7 +316,7 @@ public class FuzzyStatement
     public FuzzyVariableInfo variable;
     public string term;
 }
-
+#if UNITY_EDITOR
 [CustomEditor(typeof(ExpertSystemData))]
 public class ExpertSystemDataEditor : Editor
 {
@@ -337,3 +581,4 @@ public class ExpertSystemDataEditor : Editor
         EditorGUILayout.Space();
     }
 }
+#endif

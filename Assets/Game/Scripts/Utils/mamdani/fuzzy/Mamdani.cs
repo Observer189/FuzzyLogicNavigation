@@ -126,7 +126,7 @@ namespace fuzzy
 
         public static double Integrate(double a, double b, Func<double, double> function)
         {
-            int N = 10000;
+            int N = 100;
             double h = (b - a) / (N - 1);
 
             double sum = (1.0 / 3.0) * (function(a) + function(b));

@@ -33,19 +33,24 @@ public class NavigationTargetStrategy : AIStrategy
             var angleToTarget =
                 -Vector2.SignedAngle(mind.Perception.navigationTarget.position - mind.Ship.transform.position,
                     mind.Ship.transform.up);
+            //Debug.Log(angleToTarget);
             var distanceToTarget = (mind.Perception.navigationTarget.position - mind.Ship.transform.position).magnitude;
-            var leftFeeler = mind.Ship.feelers[0];
-            var middleFeeler = mind.Ship.feelers[1];
-            var rightFeeler = mind.Ship.feelers[2];
+            var sideLeftFeeler = mind.Ship.feelers[0];
+            var frontLeftFeeler = mind.Ship.feelers[1];
+            var middleFeeler = mind.Ship.feelers[2];
+            var frontRightFeeler = mind.Ship.feelers[3];
+            var sideRightFeeler = mind.Ship.feelers[4];
             ///Расстояния до препятствий на соответствующих сенсорах
-            var leftFeelerDistance = (leftFeeler.FeelTarget != null) ? leftFeeler.DistanceToTarget : 1000;
+            var sideLeftFeelerDistance = (sideLeftFeeler.FeelTarget != null) ? sideLeftFeeler.DistanceToTarget : 1000;
+            var leftFeelerDistance = (frontLeftFeeler.FeelTarget != null) ? frontLeftFeeler.DistanceToTarget : 1000;
             var middleFeelerDistance = (middleFeeler.FeelTarget != null) ? middleFeeler.DistanceToTarget : 1000;
-            var rightFeelerDistance = (rightFeeler.FeelTarget != null) ? rightFeeler.DistanceToTarget : 1000;
+            var rightFeelerDistance = (frontRightFeeler.FeelTarget != null) ? frontRightFeeler.DistanceToTarget : 1000;
+            var sideRightFeelerDistance = (sideRightFeeler.FeelTarget != null) ? sideRightFeeler.DistanceToTarget : 1000;
             ///Данные из настроек экспертной системы
             var inputVariables = expertSystemData.inputVariables;
             
-            Debug.Log(middleFeeler.FeelTarget);
-            Debug.Log(middleFeelerDistance);
+           // Debug.Log(middleFeeler.FeelTarget);
+            //Debug.Log(middleFeelerDistance);
              
             ///Алгоритм экспертной системы должен вызываться здесь!
             double[] inputData = new double[inputVariables.Length];
@@ -54,6 +59,8 @@ public class NavigationTargetStrategy : AIStrategy
             inputData[Array.FindIndex(inputVariables, (v) => v.name == "LeftFeelerDistance")] = leftFeelerDistance;
             inputData[Array.FindIndex(inputVariables, (v) => v.name == "RightFeelerDistance")] = rightFeelerDistance;
             inputData[Array.FindIndex(inputVariables, (v) => v.name == "MiddleFeelerDistance")] = middleFeelerDistance;
+            inputData[Array.FindIndex(inputVariables, (v) => v.name == "SideLeftFeelerDistance")] = sideLeftFeelerDistance;
+            inputData[Array.FindIndex(inputVariables, (v) => v.name == "SideRightFeelerDistance")] = sideRightFeelerDistance;
 
             var mamda = new Mamdani(expertRules, inputData);
 
@@ -61,7 +68,7 @@ public class NavigationTargetStrategy : AIStrategy
 
             ///Дефаззифицированная скорость корабля
             float targetSpeed = (float)output[1]/*(mind.Perception.navigationTarget.position - mind.Ship.transform.position).magnitude/2*/;
-            //Debug.Log(output[0]);
+            Debug.Log(output[2]);
             ///Дефазифицированная скорость поворота корабля
             float targetRotation = (float)output[0]/*-angleToTarget * 5*/;
             ///Дефазифицированная горизонтальная скорость корабля, получаемая за счет работы боковых ускорителей 
