@@ -124,7 +124,7 @@ namespace fuzzy
         }
 
 
-        public static double Integrate(double a, double b, Func<double, double> function)
+       /* public static double Integrate(double a, double b, Func<double, double> function)
         {
             int N = 100;
             double h = (b - a) / (N - 1);
@@ -144,6 +144,22 @@ namespace fuzzy
             }
 
             return sum * h;
+        }*/
+        public static double Integrate(double a, double b, Func<double, double> function)
+        {
+            int N = 1000;
+            double h = (b - a) / N;
+            double sum = function(a) + function(b);
+
+            for (int i = 1; i < N; i++)
+            {
+                double x = a + i * h;
+                sum += 2 * function(x);
+            }
+
+            return (h / 2) * sum;
+
+        
         }
 
     }
