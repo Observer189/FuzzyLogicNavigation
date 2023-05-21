@@ -20,6 +20,7 @@ public class NavigationTargetStrategy : AIStrategy
     {
         //order.movementHasRotationDirection = true;
         order.movementOrderType = MovementOrderType.TargetSpeed;
+        Debug.Log(mind.Perception.navigationTarget);
         if (mind.Perception.navigationTarget != null)
         {
             /*Vector3 moveVec = new Vector3(mind.Perception.navigationTarget.position.x, 0,
@@ -76,7 +77,7 @@ public class NavigationTargetStrategy : AIStrategy
             
             ///Здесь мы используя рассчитанные параметры отдаем приказ на движение кораблю
             //var moveVec = new Vector3(Math.Sign(targetRotation),Math.Sign(targetSpeed),0);
-            var moveVec = new Vector3(targetSpeed, targetRotation, targetHorizontalSpeed);
+            var moveVec = new Vector3( targetRotation,targetSpeed, targetHorizontalSpeed);
             
             order.movement = moveVec;
 

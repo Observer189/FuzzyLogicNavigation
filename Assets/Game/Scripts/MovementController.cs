@@ -38,6 +38,13 @@ public class MovementController : MonoBehaviour, IShipActionController
                 movementSystem.SetMovement(currentOrder.movement);
                 movementSystem.SetTargetSpeedMode(true);
             }
+            else if(currentOrder.movementOrderType == MovementOrderType.TargetSpeedWithRotationTo)
+            {
+                movementSystem.SetMovement(currentOrder.movement);
+                movementSystem.SetRotationTo(new Vector2(currentOrder.movement.x,currentOrder.movement.w));
+                movementSystem.CalculateAngularDesireSpeedByRotationTo();
+                movementSystem.SetTargetSpeedMode(true);
+            }
 
             movementSystem.SetUseThrottles(currentOrder.leftAdditionalMovement, currentOrder.rightAdditionalMovement);
         }

@@ -43,7 +43,7 @@ public class ClassicMovement : PropertyObject, IMovementSystem
     private float? targetRotation=null;
     private bool isInTargetSpeedMode;
     private Rigidbody2D shipBody;
-    private Vector3 targetMovement;
+    private Vector4 targetMovement;
     private (bool, bool) throttleUse;
 
     private float lastFrameSpeed;
@@ -67,7 +67,7 @@ public class ClassicMovement : PropertyObject, IMovementSystem
         lastFrameSpeed = shipBody.velocity.magnitude;
     }
 
-    public void SetMovement(Vector3 movement)
+    public void SetMovement(Vector4 movement)
     {
         targetMovement = movement;
     }
@@ -109,6 +109,30 @@ public class ClassicMovement : PropertyObject, IMovementSystem
         {
             targetMovement.x = -1;
         }
+    }
+
+    public void CalculateAngularDesireSpeedByRotationTo()
+    {
+        ///Рассчитываем максимальную скорость которую мы можем развить или наоборот сбросить
+        var maxMomentaryAngularSpeed = AngularPower / (Mathf.Deg2Rad * shipBody.inertia);
+
+        var targetAngularSpeed = (-targetMovement.x * AngularSpeed);
+        if (targetRotation != null)
+        {
+            ///Если мы и так достаточно точно развенуты на цель, то сбрасываем скорость до нуля
+            if (Mathf.Abs(targetRotation.Value) < rotationEpsilon)
+            {
+                targetRotation = 0;
+                targetAngularSpeed = 0;
+            }
+            else
+            {
+                targetAngularSpeed = Mathf.Sign(targetRotation.Value) * maxMomentaryAngularSpeed;
+            }
+            
+        }
+
+        targetMovement.x = targetAngularSpeed;
     }
 
     public void ProcessMovement()
@@ -170,31 +194,48 @@ public class ClassicMovement : PropertyObject, IMovementSystem
         }
         else
         {
-            Debug.Log("movement: "+targetMovement.x);
-            MMDebug.DebugDrawArrow(transform.position,forwardDir.up*targetMovement.x+forwardDir.right*targetMovement.z,Color.yellow);
-            var targetNormalized = 
-                new Vector2(targetMovement.x, targetMovement.z).normalized * 
-                Mathf.Min(targetMovement.x+targetMovement.z,MaxSpeed);
-            targetMovement.MMSetX(targetNormalized.x);
-            targetMovement.MMSetZ(targetNormalized.y);
+            HandleMovementWithDesireSpeed();
+        }
 
-            MMDebug.DebugDrawArrow(transform.position,forwardDir.up*targetMovement.x+forwardDir.right*targetMovement.z,Color.green);
+
+        HandleEngineParticles();
+        
+        targetRotation = null;
+    }
+
+    protected void HandleMovementWithDesireSpeed()
+    {
+        //Считается, что на момент выполнения процедуры в переменной targetMovement лежит следующий вектор
+        //(Желательная скорость поворота(со знаком), желательная скорость корабля сонаправленная с текущим углом поворотаб
+        //Желательная скорость корабля перпендикулярная текущему углу поворота)
+        
+        MMDebug.DebugDrawArrow(transform.position,forwardDir.up*targetMovement.y+forwardDir.right*targetMovement.z,Color.yellow);
+            var targetNormalized = 
+                new Vector2(targetMovement.y, targetMovement.z).normalized * 
+                Mathf.Min(targetMovement.y+targetMovement.z,MaxSpeed);
+            targetMovement.SetY(targetNormalized.x);
+            targetMovement.SetZ(targetNormalized.y);
+            
+            MMDebug.DebugDrawArrow(transform.position,forwardDir.up*targetMovement.y+forwardDir.right*targetMovement.z,Color.green);
             var velMag = shipBody.velocity.magnitude;
             var verticalSpeedProjection = (velMag == 0)?0:
                 shipBody.velocity.ProjectionTo(forwardDir.up);
             var horizontalSpeedProjection = (velMag == 0)?0:
                 shipBody.velocity.ProjectionTo(forwardDir.right);
-            if (verticalSpeedProjection < targetMovement.x)
+            
+//            Debug.Log("Result: "+targetMovement);
+            //Debug.Log("Speed:" + shipBody.velocity);
+            if (verticalSpeedProjection < targetMovement.y)
             {
                 shell.AddImpulse(forwardDir.up * MainEnginePower * Time.deltaTime);
                 ///Эта переменная в контексте движения нам больше не нужна, но мы ее меняем так, чтобы
                 /// работала корректная визуализация двигателей
-                targetMovement.x = 1;
+                targetMovement.y = 1;
             }
-            else if (verticalSpeedProjection > targetMovement.x)
+            else if (verticalSpeedProjection > targetMovement.y)
             {
                 shell.AddImpulse(-forwardDir.up * backEngineModifier * MainEnginePower * Time.deltaTime);
-                targetMovement.x = -1;
+                targetMovement.y = -1;
             }
 
             if (horizontalSpeedProjection < targetMovement.z)
@@ -209,27 +250,22 @@ public class ClassicMovement : PropertyObject, IMovementSystem
             }
 
             //Debug.Log(targetMovement.y);
-            targetMovement.y = Mathf.Sign(targetMovement.y) * Mathf.Min(AngularSpeed, Mathf.Abs(targetMovement.y));
-            var torque = (targetMovement.y - shipBody.angularVelocity) * Mathf.Deg2Rad * shipBody.inertia;
+            targetMovement.x = Mathf.Sign(targetMovement.x) * Mathf.Min(AngularSpeed, Mathf.Abs(targetMovement.x));
+            var torque = (targetMovement.x - shipBody.angularVelocity) * Mathf.Deg2Rad * shipBody.inertia;
             torque = Mathf.Sign(torque) * Mathf.Min(Mathf.Abs(torque), AngularPower);
             shipBody.AddTorque(torque, ForceMode2D.Impulse);
             if (torque<0)
             {
-                targetMovement.y = 1;
+                targetMovement.x = 1;
             }
             else if (torque>0)
             {
-                targetMovement.y = -1;
+                targetMovement.x = -1;
             }
             
-            /*MMDebug.DebugDrawArrow(transform.position,shipBody.velocity,Color.red);
-            MMDebug.DebugDrawArrow(transform.position,transform.up*verticalSpeedProjection,Color.magenta);
-            MMDebug.DebugDrawArrow(transform.position,transform.right*horizontalSpeedProjection,Color.magenta);*/
-        }
-
-        HandleEngineParticles();
-        
-        targetRotation = null;
+            MMDebug.DebugDrawArrow(transform.position,shipBody.velocity,Color.red);
+           MMDebug.DebugDrawArrow(transform.position,transform.up*verticalSpeedProjection,Color.magenta);
+           MMDebug.DebugDrawArrow(transform.position,transform.right*horizontalSpeedProjection,Color.magenta);
     }
 
     protected void HandleEngineParticles()

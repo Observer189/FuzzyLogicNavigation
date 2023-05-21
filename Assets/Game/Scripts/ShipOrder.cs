@@ -9,14 +9,16 @@ using UnityEngine;
 public class ShipOrder
 {
     //Describes ship movement
-    public Vector3 movement;
+    public Vector4 movement;
     //Determine how movement system considers input movement vector
     //If RotationTo then movement vector is considered as point in world space that ship want to be headed
     //as follows: y is gas/brake and (x,z) is (x,y) coordinates of rotation target in world space
     //If direct then considered y-axis as gas/brake and x as rotate left/right
-    //If TargetSpeed then x - axis is target speed for direction that ship is headed
-    //y - target rotation speed
+    //If TargetSpeed then y - axis is target speed for direction that ship is headed
+    //x - target rotation speed
     //z - axis is target speed for direction perpendicular for one that ship is headed
+    //If TargetSpeedWithRotationTo then (x,w) - point in 2d space that ship should rotate to
+    //y, z as in normal TargetSpeedMode
     public MovementOrderType movementOrderType;
     //Mouse pointer in world space or target for ship's weapons for AI
     public Vector2 aim;
@@ -43,7 +45,7 @@ public class ShipOrder
             rightAdditionalMovement, special1, special2);
     }
 
-    public ShipOrder(Vector3 movement, MovementOrderType movementOrderType, Vector2 aim, bool mainWeapon, 
+    public ShipOrder(Vector4 movement, MovementOrderType movementOrderType, Vector2 aim, bool mainWeapon, 
         bool secondaryWeapon, bool leftAdditionalMovement, bool rightAdditionalMovement, bool special1, bool special2)
     {
         this.movement = movement;
@@ -60,5 +62,5 @@ public class ShipOrder
 
 public enum MovementOrderType
 {
-    Direct, RotationTo, TargetSpeed
+    Direct, RotationTo, TargetSpeed, TargetSpeedWithRotationTo
 }
