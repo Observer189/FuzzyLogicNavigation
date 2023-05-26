@@ -35,5 +35,41 @@ namespace fuzzy
         {
             return getMaxValue(value);
         }
+        public double GetLeftBase()
+        {
+            double result = double.MaxValue;
+
+            foreach (FuzzySetInterface fuzzySet in fuzzySets)
+            {
+                result = Math.Min(result, fuzzySet.GetLeftBase());
+            }
+
+            return result;
         }
+
+        public double GetRightBase()
+        {
+            double result = double.MinValue;
+
+            foreach (FuzzySetInterface fuzzySet in fuzzySets)
+            {
+                result = Math.Max(result, fuzzySet.GetRightBase());
+            }
+
+            return result;
+        }
+
+        public double GetHeight()
+        {
+            double result = 0.0;
+
+            foreach (FuzzySetInterface fuzzySet in fuzzySets)
+            {
+                result = Math.Max(result, fuzzySet.GetHeight());
+            }
+
+            return result;
+        }
+
+    }
 }

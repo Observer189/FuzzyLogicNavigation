@@ -26,5 +26,20 @@ namespace fuzzy
         {
             return GetActivatedValue(x);
         }
+        public double GetLeftBase()
+        {
+            return fuzzySet.GetLeftBase();
+        }
+
+        public double GetRightBase()
+        {
+            return fuzzySet.GetRightBase();
+        }
+
+        public double GetHeight()
+        {
+            return fuzzySet.GetHeight();
+        }
+
     }
 }
