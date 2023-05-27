@@ -6,7 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class ShipController : MonoBehaviour
+public class ShipController : MonoBehaviour, IVessel
 {
     protected VirtualPlayer owner;
     public ShipInfo info;
@@ -14,13 +14,17 @@ public class ShipController : MonoBehaviour
 
     public Feeler[] feelers;
 
+    public ShipInfo ShipInfo => info;
+
     public PropertyManager PropertyManager { get; private set; }
+    public Feeler[] Feelers => feelers;
 
     private Rigidbody2D body;
     private ShipOrder currentOrder;
 
     private IShipActionController[] controllers;
-    
+
+    public Transform CameraTarget => cameraTarget;
     public bool IsAlive { get; private set; } = true;
 
     public VirtualPlayer Owner
@@ -28,6 +32,7 @@ public class ShipController : MonoBehaviour
         get => owner;
         set => owner = value;
     }
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
@@ -45,7 +50,7 @@ public class ShipController : MonoBehaviour
         
     }
 
-    public void UpdateOrder(ShipOrder order)
+    public virtual void UpdateOrder(ShipOrder order)
     {
         currentOrder = order;
         foreach (var controller in controllers)
@@ -61,7 +66,3 @@ public class ShipController : MonoBehaviour
     }
 }
 
-public enum ShipOwnerType
-{
-    Player, AI
-}

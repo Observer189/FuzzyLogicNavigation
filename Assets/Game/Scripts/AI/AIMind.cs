@@ -8,11 +8,11 @@ public class AIMind : MonoBehaviour
 {
    public bool IsActive=false;
    
-   public ShipController Ship => ship;
+   public IVessel Ship => ship;
 
    public AIPerception Perception => perception;
    
-   protected ShipController ship;
+   protected IVessel ship;
    protected AIPerception perception;
    /// <summary>
    /// Основные стратегии, которые могут быть применены данным кораблем
@@ -41,7 +41,7 @@ public class AIMind : MonoBehaviour
    
    protected AIStrategy currentMainStrategy;
    protected float timeAfterLastChangeMainStrategy;
-   public void SetShip(ShipController s)
+   public void SetShip(IVessel s)
    {
       ship = s;
    }

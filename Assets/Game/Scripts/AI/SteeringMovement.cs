@@ -182,7 +182,7 @@ public class SteeringMovement : MonoBehaviour
     {
         var shipWidth = 0.6f;
         var shipLength = 0.6f;
-        var minDetectionBoxLength = 1.5f;
+        var minDetectionBoxLength = 2f;
         var m_dBoxLength = minDetectionBoxLength +
                            (body.velocity.magnitude / movementSystem.MaxSpeed) * minDetectionBoxLength;
         
@@ -190,6 +190,8 @@ public class SteeringMovement : MonoBehaviour
         var velDir = body.velocity.normalized;
         var perpVelDir = velDir.MMRotate(-90);
 
+        
+        
         var hit = Physics2D.BoxCast(body.position,
             new Vector2(shipLength, shipWidth), Vector2.SignedAngle(Vector2.right, body.velocity), body.velocity,
             m_dBoxLength,obstacleMask);
@@ -232,7 +234,7 @@ public class SteeringMovement : MonoBehaviour
             Debug.Log("Y = "+(obstacleRadius - perpHeadDist)*multiplier);
             //SteeringForce.MMSetY((obstacleRadius - perpHeadDist)*multiplier);
 
-            var brakingWeight = 0.0f;
+            var brakingWeight = 0.6f;
 
            // SteeringForce.MMSetX((obstacleRadius - headDist)*brakingWeight);
            var laterVelocity = ((obstacleRadius - perpHeadDist) * multiplier) * perpVelDir;
@@ -263,7 +265,7 @@ public class SteeringMovement : MonoBehaviour
 
         float lookAheadTime = toOffset.magnitude / (movementSystem.MaxSpeed + leader.velocity.magnitude);
 
-        return ArriveCalc(worldOffsetPos + leader.velocity * lookAheadTime, 0.4f, movementSystem, body);
+        return ArriveCalc(worldOffsetPos + leader.velocity * lookAheadTime, 0.5f, movementSystem, body);
     }
 }
 

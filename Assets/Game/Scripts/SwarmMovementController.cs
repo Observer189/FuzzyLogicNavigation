@@ -52,6 +52,8 @@ public class SwarmMovementController : MonoBehaviour, IShipActionController
 
                 var leader = droneBodies[0];
 
+                var formationPositionAssociation = CalculateBestDronesPositions(leader);
+
                 for (int i = 0; i < dronesMovementSystems.Count; i++)
                 {
                     var drone = dronesMovementSystems[i];
@@ -64,7 +66,7 @@ public class SwarmMovementController : MonoBehaviour, IShipActionController
                     {
                         drone.steeringBehaviorPreset = regularDronePreset;
 
-                        drone.SteeringData.offsetPursuit = swarmFormationOffsets[i - 1];
+                        drone.SteeringData.offsetPursuit = swarmFormationOffsets[formationPositionAssociation[i]];
                     }
 
                     drone.SteeringData.seekTarget = currentOrder.aim;
@@ -78,6 +80,58 @@ public class SwarmMovementController : MonoBehaviour, IShipActionController
                 }
             }
         }
+    }
+
+    int[] CalculateBestDronesPositions(Rigidbody2D leader)
+    {
+        Vector2[] absoluteOffsetPositions = new Vector2[swarmFormationOffsets.Length];
+        Vector2 centerOfMass = Vector2.zero;
+        for (int i = 0; i < swarmFormationOffsets.Length; i++)
+        {
+            absoluteOffsetPositions[i] = leader.position+(Vector2)(leader.transform.up * swarmFormationOffsets[i].y + 
+                                                                   leader.transform.right*swarmFormationOffsets[i].x);
+            centerOfMass += absoluteOffsetPositions[i];
+        }
+
+        centerOfMass /= swarmFormationOffsets.Length;
+        //Ключ - расстояние до центра масс
+        //Значение - индекс соответствующего дрона в массиве dronesMovementSystems
+        SortedDictionary<float, int> distToCenterOfMass = new SortedDictionary<float, int>();
+        
+        for (int i = 0; i < dronesMovementSystems.Count;i++)
+        {
+            if (dronesMovementSystems[i].Body != leader)
+            {
+                distToCenterOfMass.Add(-(dronesMovementSystems[i].Body.position - centerOfMass).sqrMagnitude, i);
+            }
+        }
+
+        int[] res = new int[dronesMovementSystems.Count];
+
+        HashSet<int> occupiedPositions = new HashSet<int>();
+        foreach (var droneInd in distToCenterOfMass.Values)
+        {
+            
+            float minDist = float.MaxValue;
+            int minInd = -1;
+            for (int i = 0; i < swarmFormationOffsets.Length; i++)
+            {
+                if (occupiedPositions.Contains(i))
+                   continue;
+
+                var dist = (dronesMovementSystems[droneInd].Body.position - absoluteOffsetPositions[i]).sqrMagnitude;
+                if (dist<minDist)
+                {
+                    minDist = dist;
+                    minInd = i;
+                }
+            }
+
+            res[droneInd] = minInd;
+            occupiedPositions.Add(minInd);
+        }
+
+        return res;
     }
 
     public void UpdateOrder(ShipOrder order)

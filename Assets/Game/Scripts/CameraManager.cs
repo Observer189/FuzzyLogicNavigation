@@ -188,7 +188,7 @@ public class CameraManager : MMSingleton<CameraManager>
         {
             var hit = Physics2D.Raycast(mainCamera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
             if (hit != null && hit.collider.attachedRigidbody!=null 
-                            && hit.collider.attachedRigidbody.GetComponent<ShipController>()!=null)
+                            && hit.collider.attachedRigidbody.GetComponent<IVessel>()!=null)
             {
                 followTargetInFreeMode = hit.collider.attachedRigidbody.transform;
             }

@@ -36,11 +36,11 @@ public class NavigationTargetStrategy : AIStrategy
                     mind.Ship.transform.up);
             //Debug.Log(angleToTarget);
             var distanceToTarget = (mind.Perception.navigationTarget.position - mind.Ship.transform.position).magnitude;
-            var sideLeftFeeler = mind.Ship.feelers[0];
-            var frontLeftFeeler = mind.Ship.feelers[1];
-            var middleFeeler = mind.Ship.feelers[2];
-            var frontRightFeeler = mind.Ship.feelers[3];
-            var sideRightFeeler = mind.Ship.feelers[4];
+            var sideLeftFeeler = mind.Ship.Feelers[0];
+            var frontLeftFeeler = mind.Ship.Feelers[1];
+            var middleFeeler = mind.Ship.Feelers[2];
+            var frontRightFeeler = mind.Ship.Feelers[3];
+            var sideRightFeeler = mind.Ship.Feelers[4];
             ///Расстояния до препятствий на соответствующих сенсорах
             var sideLeftFeelerDistance = (sideLeftFeeler.FeelTarget != null) ? sideLeftFeeler.DistanceToTarget : 1000;
             var leftFeelerDistance = (frontLeftFeeler.FeelTarget != null) ? frontLeftFeeler.DistanceToTarget : 1000;
