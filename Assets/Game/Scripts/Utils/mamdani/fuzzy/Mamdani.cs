@@ -1,4 +1,4 @@
-п»їusing System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,15 +7,16 @@ using UnityEngine;
 
 namespace fuzzy
 {
-    public class Mamdani { 
-     private List<Rule> rules;
-    private double[] inputData;
-
-    public Mamdani(List<Rule> rules, double[] inputData)
+    public class Mamdani
     {
-        this.rules = rules;
-        this.inputData = inputData;
-    }
+        private List<Rule> rules;
+        private double[] inputData;
+
+        public Mamdani(List<Rule> rules, double[] inputData)
+        {
+            this.rules = rules;
+            this.inputData = inputData;
+        }
 
         public List<double> execute()
         {
@@ -82,14 +83,18 @@ namespace fuzzy
         {
             Dictionary<int, UnionOfFuzzySets> unionsOfFuzzySets = new Dictionary<int, UnionOfFuzzySets>();
             int i = 0;
-            foreach (Rule rule in rules) { 
-                foreach (Conclusion conclusion in rule.GetConclusions()) { 
-                    int index = conclusion.GetVariable().GetId(); 
-                    if (!unionsOfFuzzySets.ContainsKey(index)) { 
-                        unionsOfFuzzySets.Add(index, new UnionOfFuzzySets()); 
-                    } 
-                    unionsOfFuzzySets[index].AddFuzzySet(activatedFuzzySets[i]); 
-                    i++; }
+            foreach (Rule rule in rules)
+            {
+                foreach (Conclusion conclusion in rule.GetConclusions())
+                {
+                    int index = conclusion.GetVariable().GetId();
+                    if (!unionsOfFuzzySets.ContainsKey(index))
+                    {
+                        unionsOfFuzzySets.Add(index, new UnionOfFuzzySets());
+                    }
+                    unionsOfFuzzySets[index].AddFuzzySet(activatedFuzzySets[i]);
+                    i++;
+                }
             }
             return new List<UnionOfFuzzySets>(unionsOfFuzzySets.Values);
         }
@@ -109,7 +114,14 @@ namespace fuzzy
 
         private double Integral(FuzzySetInterface fuzzySet, bool b)
         {
-            //Func<double, double> function = b ? (x => x * fuzzySet.GetValue(x)) : fuzzySet.GetValue;
+            double leftBase = fuzzySet.GetLeftBase();
+            double rightBase = fuzzySet.GetRightBase();
+            double height = fuzzySet.GetHeight();
+
+            int numSubintervals = 10; // Количество подинтервалов
+            double subintervalWidth = (rightBase - leftBase) / numSubintervals; // Ширина каждого подинтервала
+
+            double integral = 0.0;
 
             Func<double, double> function;
             if (b)
@@ -120,30 +132,26 @@ namespace fuzzy
             {
                 function = delegate (double x) { return fuzzySet.GetValue(x); };
             }
-            return Integrate(-200, 200, function);
+
+            for (int i = 0; i < numSubintervals; i++)
+            {
+                double subintervalLeft = leftBase + i * subintervalWidth;
+                double subintervalRight = subintervalLeft + subintervalWidth;
+
+                double subintervalIntegral = Integrate(subintervalLeft, subintervalRight, function);
+                integral += subintervalIntegral;
+            }
+
+            return integral;
         }
 
 
         public static double Integrate(double a, double b, Func<double, double> function)
         {
-            int N = 100;
-            double h = (b - a) / (N - 1);
+            double h = (function(a) + function(b)) / 2; // Среднее значение функции на левой и правой границах
+            double baseWidth = b - a; // Ширина основания трапеции
 
-            double sum = (1.0 / 3.0) * (function(a) + function(b));
-
-            for (int i = 1; i < N - 1; i += 2)
-            {
-                double x = a + h * i;
-                sum += (4.0 / 3.0) * function(x);
-            }
-
-            for (int i = 2; i < N - 1; i += 2)
-            {
-                double x = a + h * i;
-                sum += (2.0 / 3.0) * function(x);
-            }
-
-            return sum * h;
+            return h * baseWidth; // Площадь трапеции
         }
 
     }

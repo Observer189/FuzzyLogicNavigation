@@ -8,6 +8,11 @@ namespace fuzzy
 {
     public interface FuzzySetInterface
     {
+     
         double GetValue(double v);
+
+        double GetLeftBase();
+        double GetRightBase();
+        double GetHeight();
     }
 }
