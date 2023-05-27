@@ -17,6 +17,21 @@ namespace fuzzy
             trapezoidIntervals = intervals.Select(i => (double)i).ToList();
         }
 
+        public double GetLeftBase()
+        {
+            return trapezoidIntervals[0];
+        }
+
+        public double GetRightBase()
+        {
+            return trapezoidIntervals[3];
+        }
+
+        public double GetHeight()
+        {
+            return Math.Max(trapezoidIntervals[1] - trapezoidIntervals[0], trapezoidIntervals[3] - trapezoidIntervals[2]);
+        }
+
         //?? пока трапезоида 
         public double GetValue(double value)
         {
@@ -56,6 +71,7 @@ namespace fuzzy
             return 0;
         }
     }
+
 
 }
 
