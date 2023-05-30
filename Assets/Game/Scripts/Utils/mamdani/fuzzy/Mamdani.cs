@@ -118,8 +118,8 @@ namespace fuzzy
             double rightBase = fuzzySet.GetRightBase();
             double height = fuzzySet.GetHeight();
 
-            int numSubintervals = 10; // Количество подинтервалов
-            double subintervalWidth = (rightBase - leftBase) / numSubintervals; // Ширина каждого подинтервала
+            int numSubintervals = 10; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            double subintervalWidth = (rightBase - leftBase) / numSubintervals; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
             double integral = 0.0;
 
@@ -148,10 +148,10 @@ namespace fuzzy
 
         public static double Integrate(double a, double b, Func<double, double> function)
         {
-            double h = (function(a) + function(b)) / 2; // Среднее значение функции на левой и правой границах
-            double baseWidth = b - a; // Ширина основания трапеции
+            double h = (function(a) + function(b)) / 2; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            double baseWidth = b - a; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
-            return h * baseWidth; // Площадь трапеции
+            return h * baseWidth; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         }
 
     }
