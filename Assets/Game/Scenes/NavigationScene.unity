@@ -207,7 +207,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &97875285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1682,6 +1682,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 2052343963506630829}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &957315185 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4223944591666796415, guid: 538f896e7840f2047ad8091ebd31fa46,
+    type: 3}
+  m_PrefabInstance: {fileID: 2052343963506630829}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5854420c99581b46a02824053d10385, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &985805188
 GameObject:
   m_ObjectHideFlags: 0
@@ -1721,7 +1733,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 985805188}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e9b5a3910beb014fa8ddeac4e230ef2, type: 3}
   m_Name: 
@@ -3762,7 +3774,7 @@ MonoBehaviour:
   team:
     number: 0
     color: {r: 0, g: 0, b: 0, a: 0}
-  ship: {fileID: 0}
+  ship: {fileID: 957315185}
 --- !u!114 &1751918978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4997,7 +5009,7 @@ PrefabInstance:
     - target: {fileID: 4019452914897492279, guid: 538f896e7840f2047ad8091ebd31fa46,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4223944591666796415, guid: 538f896e7840f2047ad8091ebd31fa46,
         type: 3}

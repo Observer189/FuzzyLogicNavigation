@@ -877,7 +877,7 @@ public class ExpertSystemDataEditor : Editor
         
         EditorGUI.BeginChangeCheck();
         //rulesList.DoLayoutList();
-
+         Debug.Log(rulesList.count);
         // Add buttons to add new input/output variables and rules
         if (GUILayout.Button("Add Input Variable"))
         {
